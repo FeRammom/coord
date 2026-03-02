@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Trash2, Eye, Pencil, ArrowUpDown } from 'lucide-react'
+import { Trash2, Eye, ArrowUpDown } from 'lucide-react'
 import { deleteEventAction } from '@/app/actions/events'
 import { EventFormDialog } from './event-form-dialog'
 import Link from 'next/link'
@@ -28,13 +28,13 @@ const statusLabels: Record<string, string> = {
 const statusColors: Record<string, string> = {
   planned: 'bg-secondary text-secondary-foreground',
   active: 'bg-primary text-primary-foreground',
-  completed: 'bg-success text-success-foreground',
+  completed: 'bg-chart-2/15 text-chart-2',
   cancelled: 'bg-destructive/10 text-destructive',
 }
 
 export function EventsTable({ events }: { events: Event[] }) {
   const [search, setSearch] = useState('')
-  const [sortKey, setSortKey] = useState<'title' | 'event_date' | 'status'>('event_date')
+  const [sortKey, setSortKey] = useState<'title' | 'date' | 'status'>('date')
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc')
 
   const toggleSort = (key: typeof sortKey) => {
@@ -73,24 +73,25 @@ export function EventsTable({ events }: { events: Event[] }) {
                 </button>
               </TableHead>
               <TableHead>
-                <button onClick={() => toggleSort('event_date')} className="flex items-center gap-1 font-medium">
+                <button onClick={() => toggleSort('date')} className="flex items-center gap-1 font-medium">
                   Дата <ArrowUpDown className="h-3 w-3" />
                 </button>
               </TableHead>
+              <TableHead>Время</TableHead>
               <TableHead>Место</TableHead>
               <TableHead>
                 <button onClick={() => toggleSort('status')} className="flex items-center gap-1 font-medium">
                   Статус <ArrowUpDown className="h-3 w-3" />
                 </button>
               </TableHead>
-              <TableHead>Макс. координаторов</TableHead>
+              <TableHead>Лимит</TableHead>
               <TableHead className="text-right">Действия</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filtered.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="py-8 text-center text-muted-foreground">
+                <TableCell colSpan={7} className="py-8 text-center text-muted-foreground">
                   Мероприятий не найдено
                 </TableCell>
               </TableRow>
@@ -99,17 +100,18 @@ export function EventsTable({ events }: { events: Event[] }) {
                 <TableRow key={event.id}>
                   <TableCell className="font-medium">{event.title}</TableCell>
                   <TableCell>
-                    {event.event_date
-                      ? new Date(event.event_date).toLocaleDateString('ru-RU')
+                    {event.date
+                      ? new Date(event.date).toLocaleDateString('ru-RU')
                       : '—'}
                   </TableCell>
+                  <TableCell>{event.time || '—'}</TableCell>
                   <TableCell>{event.location || '—'}</TableCell>
                   <TableCell>
                     <Badge className={statusColors[event.status]} variant="secondary">
                       {statusLabels[event.status]}
                     </Badge>
                   </TableCell>
-                  <TableCell>{event.max_coordinators || '—'}</TableCell>
+                  <TableCell>{event.participant_limit || '—'}</TableCell>
                   <TableCell>
                     <div className="flex items-center justify-end gap-1">
                       <Link href={`/admin/events/${event.id}`}>

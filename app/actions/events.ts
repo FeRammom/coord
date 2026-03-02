@@ -11,23 +11,25 @@ export async function createEventAction(
   await requireAdmin()
   const title = formData.get('title') as string
   const description = formData.get('description') as string
-  const event_date = formData.get('event_date') as string
+  const date = formData.get('date') as string
+  const time = formData.get('time') as string
   const location = formData.get('location') as string
-  const max_coordinators = formData.get('max_coordinators') as string
+  const participant_limit = formData.get('participant_limit') as string
   const status = formData.get('status') as string
 
   if (!title) return { error: 'Введите название мероприятия' }
 
   const db = getDb()
   db.prepare(`
-    INSERT INTO events (title, description, event_date, location, max_coordinators, status)
-    VALUES (?, ?, ?, ?, ?, ?)
+    INSERT INTO events (title, description, date, time, location, participant_limit, status)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
   `).run(
     title,
-    description || null,
-    event_date || null,
-    location || null,
-    max_coordinators ? parseInt(max_coordinators) : null,
+    description || '',
+    date || '',
+    time || '',
+    location || '',
+    participant_limit ? parseInt(participant_limit) : 0,
     status || 'planned'
   )
 
@@ -43,23 +45,25 @@ export async function updateEventAction(
   const id = formData.get('id') as string
   const title = formData.get('title') as string
   const description = formData.get('description') as string
-  const event_date = formData.get('event_date') as string
+  const date = formData.get('date') as string
+  const time = formData.get('time') as string
   const location = formData.get('location') as string
-  const max_coordinators = formData.get('max_coordinators') as string
+  const participant_limit = formData.get('participant_limit') as string
   const status = formData.get('status') as string
 
   if (!title) return { error: 'Введите название мероприятия' }
 
   const db = getDb()
   db.prepare(`
-    UPDATE events SET title = ?, description = ?, event_date = ?, location = ?, max_coordinators = ?, status = ?
+    UPDATE events SET title = ?, description = ?, date = ?, time = ?, location = ?, participant_limit = ?, status = ?
     WHERE id = ?
   `).run(
     title,
-    description || null,
-    event_date || null,
-    location || null,
-    max_coordinators ? parseInt(max_coordinators) : null,
+    description || '',
+    date || '',
+    time || '',
+    location || '',
+    participant_limit ? parseInt(participant_limit) : 0,
     status || 'planned',
     parseInt(id)
   )
@@ -71,16 +75,18 @@ export async function updateEventAction(
 export async function deleteEventAction(id: number) {
   await requireAdmin()
   const db = getDb()
-  db.prepare('DELETE FROM applications WHERE event_id = ?').run(id)
-  db.prepare('DELETE FROM ratings WHERE event_id = ?').run(id)
+  db.prepare('DELETE FROM feedback_responses WHERE event_id = ?').run(id)
+  db.prepare('DELETE FROM feedback_fields WHERE template_id IN (SELECT id FROM feedback_templates WHERE event_id = ?)').run(id)
   db.prepare('DELETE FROM feedback_templates WHERE event_id = ?').run(id)
+  db.prepare('DELETE FROM ratings WHERE event_id = ?').run(id)
+  db.prepare('DELETE FROM applications WHERE event_id = ?').run(id)
   db.prepare('DELETE FROM events WHERE id = ?').run(id)
   revalidatePath('/admin/events')
 }
 
-export async function updateApplicationStatusAction(appId: number, status: 'approved' | 'rejected', comment?: string) {
+export async function updateApplicationStatusAction(appId: number, status: 'approved' | 'rejected', rejectReason?: string) {
   await requireAdmin()
   const db = getDb()
-  db.prepare('UPDATE applications SET status = ?, comment = ? WHERE id = ?').run(status, comment || null, appId)
+  db.prepare('UPDATE applications SET status = ?, reject_reason = ? WHERE id = ?').run(status, rejectReason || '', appId)
   revalidatePath('/admin/events')
 }

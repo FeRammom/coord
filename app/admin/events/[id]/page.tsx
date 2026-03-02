@@ -4,10 +4,10 @@ import { notFound } from 'next/navigation'
 import type { Event, Application, Rating } from '@/lib/types'
 import { ApplicationsManager } from '@/components/admin/applications-manager'
 import { RatingsManager } from '@/components/admin/ratings-manager'
-import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { CalendarDays, MapPin, Users } from 'lucide-react'
+import { CalendarDays, MapPin, Users, Clock } from 'lucide-react'
 import { getSession } from '@/lib/auth'
+import { Badge } from '@/components/ui/badge'
 
 const statusLabels: Record<string, string> = {
   planned: 'Планируется',
@@ -24,7 +24,8 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
   if (!event) notFound()
 
   const applications = db.prepare(`
-    SELECT a.*, u.full_name as user_full_name, u.email as user_email, u.phone as user_phone, u.organization as user_organization
+    SELECT a.*, u.full_name as user_full_name, u.direction as user_direction, 
+           u.group_name as user_group_name, u.phone as user_phone, u.residence as user_residence
     FROM applications a
     JOIN users u ON a.user_id = u.id
     WHERE a.event_id = ?
@@ -46,21 +47,30 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
       <PageHeader title={event.title} description="Подробная информация о мероприятии" />
       <div className="flex-1 p-6">
         <div className="flex flex-col gap-6">
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
             <Card>
               <CardContent className="flex items-center gap-3 pt-6">
                 <CalendarDays className="h-5 w-5 text-primary" />
                 <div>
                   <p className="text-xs text-muted-foreground">Дата</p>
                   <p className="text-sm font-medium">
-                    {event.event_date
-                      ? new Date(event.event_date).toLocaleDateString('ru-RU', {
+                    {event.date
+                      ? new Date(event.date).toLocaleDateString('ru-RU', {
                           day: 'numeric',
                           month: 'long',
                           year: 'numeric',
                         })
                       : 'Не указана'}
                   </p>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="flex items-center gap-3 pt-6">
+                <Clock className="h-5 w-5 text-primary" />
+                <div>
+                  <p className="text-xs text-muted-foreground">Время</p>
+                  <p className="text-sm font-medium">{event.time || 'Не указано'}</p>
                 </div>
               </CardContent>
             </Card>
@@ -79,8 +89,8 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
                 <div>
                   <p className="text-xs text-muted-foreground">Координаторы</p>
                   <p className="text-sm font-medium">
-                    {applications.filter((a) => a.status === 'approved').length}
-                    {event.max_coordinators ? ` / ${event.max_coordinators}` : ''}
+                    {approvedApps.length}
+                    {event.participant_limit ? ` / ${event.participant_limit}` : ''}
                   </p>
                 </div>
               </CardContent>
@@ -100,7 +110,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Заявки координаторов ({applications.length})</CardTitle>
+              <CardTitle className="text-base">{'Заявки координаторов (' + applications.length + ')'}</CardTitle>
             </CardHeader>
             <CardContent>
               <ApplicationsManager applications={applications} />

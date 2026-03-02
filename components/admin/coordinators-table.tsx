@@ -18,7 +18,7 @@ import { CoordinatorFormDialog } from './coordinator-form-dialog'
 
 export function CoordinatorsTable({ coordinators }: { coordinators: User[] }) {
   const [search, setSearch] = useState('')
-  const [sortKey, setSortKey] = useState<'full_name' | 'email' | 'organization'>('full_name')
+  const [sortKey, setSortKey] = useState<'full_name' | 'direction' | 'group_name'>('full_name')
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc')
 
   const toggleSort = (key: typeof sortKey) => {
@@ -33,8 +33,8 @@ export function CoordinatorsTable({ coordinators }: { coordinators: User[] }) {
   const filtered = coordinators
     .filter((c) =>
       c.full_name.toLowerCase().includes(search.toLowerCase()) ||
-      (c.email && c.email.toLowerCase().includes(search.toLowerCase())) ||
-      (c.organization && c.organization.toLowerCase().includes(search.toLowerCase()))
+      (c.direction && c.direction.toLowerCase().includes(search.toLowerCase())) ||
+      (c.group_name && c.group_name.toLowerCase().includes(search.toLowerCase()))
     )
     .sort((a, b) => {
       const aVal = a[sortKey] ?? ''
@@ -46,7 +46,7 @@ export function CoordinatorsTable({ coordinators }: { coordinators: User[] }) {
   return (
     <div className="flex flex-col gap-4">
       <Input
-        placeholder="Поиск по имени, email, организации..."
+        placeholder="Поиск по имени, направлению, группе..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         className="max-w-sm"
@@ -62,16 +62,17 @@ export function CoordinatorsTable({ coordinators }: { coordinators: User[] }) {
               </TableHead>
               <TableHead>Логин</TableHead>
               <TableHead>
-                <button onClick={() => toggleSort('email')} className="flex items-center gap-1 font-medium">
-                  Email <ArrowUpDown className="h-3 w-3" />
+                <button onClick={() => toggleSort('direction')} className="flex items-center gap-1 font-medium">
+                  Направление <ArrowUpDown className="h-3 w-3" />
+                </button>
+              </TableHead>
+              <TableHead>
+                <button onClick={() => toggleSort('group_name')} className="flex items-center gap-1 font-medium">
+                  Группа <ArrowUpDown className="h-3 w-3" />
                 </button>
               </TableHead>
               <TableHead>Телефон</TableHead>
-              <TableHead>
-                <button onClick={() => toggleSort('organization')} className="flex items-center gap-1 font-medium">
-                  Организация <ArrowUpDown className="h-3 w-3" />
-                </button>
-              </TableHead>
+              <TableHead>Место проживания</TableHead>
               <TableHead>Дата регистрации</TableHead>
               <TableHead className="text-right">Действия</TableHead>
             </TableRow>
@@ -79,7 +80,7 @@ export function CoordinatorsTable({ coordinators }: { coordinators: User[] }) {
           <TableBody>
             {filtered.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="py-8 text-center text-muted-foreground">
+                <TableCell colSpan={8} className="py-8 text-center text-muted-foreground">
                   Координаторов не найдено
                 </TableCell>
               </TableRow>
@@ -88,9 +89,10 @@ export function CoordinatorsTable({ coordinators }: { coordinators: User[] }) {
                 <TableRow key={coord.id}>
                   <TableCell className="font-medium">{coord.full_name}</TableCell>
                   <TableCell className="text-muted-foreground">{coord.login}</TableCell>
-                  <TableCell>{coord.email || '—'}</TableCell>
+                  <TableCell>{coord.direction || '—'}</TableCell>
+                  <TableCell>{coord.group_name || '—'}</TableCell>
                   <TableCell>{coord.phone || '—'}</TableCell>
-                  <TableCell>{coord.organization || '—'}</TableCell>
+                  <TableCell>{coord.residence || '—'}</TableCell>
                   <TableCell className="text-muted-foreground">
                     {new Date(coord.created_at).toLocaleDateString('ru-RU')}
                   </TableCell>

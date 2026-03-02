@@ -4,7 +4,6 @@ import { useState } from 'react'
 import type { Application, Rating } from '@/lib/types'
 import { setRatingAction } from '@/app/actions/ratings'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import {
   Table,
   TableBody,
@@ -35,13 +34,6 @@ export function RatingsManager({
     }
     return map
   })
-  const [comments, setComments] = useState<Record<number, string>>(() => {
-    const map: Record<number, string> = {}
-    for (const r of ratings) {
-      map[r.user_id] = r.comment || ''
-    }
-    return map
-  })
   const [saving, setSaving] = useState<number | null>(null)
 
   const handleSave = async (userId: number) => {
@@ -51,7 +43,7 @@ export function RatingsManager({
       return
     }
     setSaving(userId)
-    await setRatingAction(eventId, userId, score, comments[userId] || null, adminId)
+    await setRatingAction(eventId, userId, score, adminId)
     setSaving(null)
     toast.success('Оценка сохранена')
     router.refresh()
@@ -64,7 +56,6 @@ export function RatingsManager({
           <TableRow>
             <TableHead>Координатор</TableHead>
             <TableHead>Оценка (1-10)</TableHead>
-            <TableHead>Комментарий</TableHead>
             <TableHead className="text-right">Действие</TableHead>
           </TableRow>
         </TableHeader>
@@ -89,14 +80,6 @@ export function RatingsManager({
                     </button>
                   ))}
                 </div>
-              </TableCell>
-              <TableCell>
-                <Input
-                  value={comments[app.user_id] || ''}
-                  onChange={(e) => setComments({ ...comments, [app.user_id]: e.target.value })}
-                  placeholder="Комментарий..."
-                  className="max-w-xs"
-                />
               </TableCell>
               <TableCell className="text-right">
                 <Button

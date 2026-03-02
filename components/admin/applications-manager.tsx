@@ -23,9 +23,9 @@ const statusLabels: Record<string, string> = {
 }
 
 const statusColors: Record<string, string> = {
-  pending: 'bg-warning/15 text-warning-foreground border-warning/30',
-  approved: 'bg-success/15 text-success border-success/30',
-  rejected: 'bg-destructive/10 text-destructive border-destructive/30',
+  pending: 'bg-secondary text-secondary-foreground',
+  approved: 'bg-chart-2/15 text-chart-2',
+  rejected: 'bg-destructive/10 text-destructive',
 }
 
 export function ApplicationsManager({ applications }: { applications: Application[] }) {
@@ -49,9 +49,10 @@ export function ApplicationsManager({ applications }: { applications: Applicatio
         <TableHeader>
           <TableRow>
             <TableHead>ФИО</TableHead>
-            <TableHead>Email</TableHead>
+            <TableHead>Направление</TableHead>
+            <TableHead>Группа</TableHead>
             <TableHead>Телефон</TableHead>
-            <TableHead>Организация</TableHead>
+            <TableHead>Место проживания</TableHead>
             <TableHead>Статус</TableHead>
             <TableHead>Дата подачи</TableHead>
             <TableHead className="text-right">Действия</TableHead>
@@ -61,9 +62,10 @@ export function ApplicationsManager({ applications }: { applications: Applicatio
           {applications.map((app) => (
             <TableRow key={app.id}>
               <TableCell className="font-medium">{app.user_full_name}</TableCell>
-              <TableCell>{app.user_email || '—'}</TableCell>
+              <TableCell>{app.user_direction || '—'}</TableCell>
+              <TableCell>{app.user_group_name || '—'}</TableCell>
               <TableCell>{app.user_phone || '—'}</TableCell>
-              <TableCell>{app.user_organization || '—'}</TableCell>
+              <TableCell>{app.user_residence || '—'}</TableCell>
               <TableCell>
                 <Badge variant="outline" className={statusColors[app.status]}>
                   {statusLabels[app.status]}
@@ -78,7 +80,7 @@ export function ApplicationsManager({ applications }: { applications: Applicatio
                     <Button
                       variant="ghost"
                       size="icon-sm"
-                      className="text-success hover:text-success"
+                      className="text-chart-2 hover:text-chart-2"
                       title="Одобрить"
                       onClick={() => handleStatus(app.id, 'approved')}
                       disabled={loading === app.id}

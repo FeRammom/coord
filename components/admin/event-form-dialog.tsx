@@ -68,7 +68,7 @@ export function EventFormDialog({ mode, event }: EventFormDialogProps) {
             </div>
           )}
           <div className="flex flex-col gap-2">
-            <Label htmlFor="title">Название *</Label>
+            <Label htmlFor="title">{'Название *'}</Label>
             <Input id="title" name="title" defaultValue={event?.title} required />
           </div>
           <div className="flex flex-col gap-2">
@@ -77,17 +77,23 @@ export function EventFormDialog({ mode, event }: EventFormDialogProps) {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-2">
-              <Label htmlFor="event_date">Дата</Label>
-              <Input id="event_date" name="event_date" type="date" defaultValue={event?.event_date || ''} />
+              <Label htmlFor="date">Дата</Label>
+              <Input id="date" name="date" type="date" defaultValue={event?.date || ''} />
             </div>
             <div className="flex flex-col gap-2">
-              <Label htmlFor="max_coordinators">Макс. координаторов</Label>
-              <Input id="max_coordinators" name="max_coordinators" type="number" min="1" defaultValue={event?.max_coordinators || ''} />
+              <Label htmlFor="time">Время</Label>
+              <Input id="time" name="time" type="time" defaultValue={event?.time || ''} />
             </div>
           </div>
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="location">Место проведения</Label>
-            <Input id="location" name="location" defaultValue={event?.location || ''} />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="location">Место проведения</Label>
+              <Input id="location" name="location" defaultValue={event?.location || ''} />
+            </div>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="participant_limit">Лимит координаторов</Label>
+              <Input id="participant_limit" name="participant_limit" type="number" min="0" defaultValue={event?.participant_limit || ''} />
+            </div>
           </div>
           <div className="flex flex-col gap-2">
             <Label htmlFor="status">Статус</Label>
