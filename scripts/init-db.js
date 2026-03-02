@@ -25,10 +25,12 @@ db.exec(`
   CREATE TABLE IF NOT EXISTS events (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     title TEXT NOT NULL,
+    description TEXT DEFAULT '',
     date TEXT NOT NULL,
-    time TEXT NOT NULL,
-    location TEXT NOT NULL,
+    time TEXT NOT NULL DEFAULT '',
+    location TEXT NOT NULL DEFAULT '',
     participant_limit INTEGER NOT NULL DEFAULT 0,
+    status TEXT NOT NULL DEFAULT 'planned',
     created_at TEXT DEFAULT (datetime('now'))
   );
 
@@ -56,6 +58,7 @@ db.exec(`
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     event_id INTEGER REFERENCES events(id) ON DELETE SET NULL,
     name TEXT NOT NULL,
+    is_active INTEGER NOT NULL DEFAULT 1,
     created_at TEXT DEFAULT (datetime('now'))
   );
 
