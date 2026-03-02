@@ -21,12 +21,15 @@ export default async function DashboardFeedbackPage() {
     ORDER BY ft.created_at DESC
   `).all(session!.id) as (FeedbackTemplate & { event_title: string })[]
 
-  // Check which ones are already filled
-  const respondedIds = db.prepare(
-    'SELECT template_id FROM feedback_responses WHERE user_id = ?'
-  ).all(session!.id) as { template_id: number }[]
+  // Check which templates are already filled by checking if any field responses exist
+  const respondedTemplateIds = db.prepare(`
+    SELECT DISTINCT ff.template_id
+    FROM feedback_responses fr
+    JOIN feedback_fields ff ON fr.field_id = ff.id
+    WHERE fr.user_id = ?
+  `).all(session!.id) as { template_id: number }[]
 
-  const respondedSet = new Set(respondedIds.map((r) => r.template_id))
+  const respondedSet = new Set(respondedTemplateIds.map((r) => r.template_id))
 
   return (
     <>
@@ -53,7 +56,7 @@ export default async function DashboardFeedbackPage() {
                       <FileText className="h-5 w-5 text-primary" />
                     </div>
                     <div>
-                      <p className="font-medium">{t.title}</p>
+                      <p className="font-medium">{t.name}</p>
                       <p className="text-xs text-muted-foreground">{t.event_title}</p>
                     </div>
                   </div>

@@ -22,12 +22,12 @@ export default async function ApplicationsPage() {
   const db = getDb()
 
   const applications = db.prepare(`
-    SELECT a.*, e.title as event_title, e.event_date, e.location
+    SELECT a.*, e.title as event_title, e.date as event_date, e.time as event_time, e.location
     FROM applications a
     JOIN events e ON a.event_id = e.id
     WHERE a.user_id = ?
     ORDER BY a.created_at DESC
-  `).all(session!.id) as (Application & { event_date: string | null; location: string | null })[]
+  `).all(session!.id) as (Application & { event_date: string | null; event_time: string | null; location: string | null })[]
 
   return (
     <>
@@ -51,14 +51,17 @@ export default async function ApplicationsPage() {
                   <p className="font-medium">{app.event_title}</p>
                   <div className="flex items-center gap-3 text-xs text-muted-foreground">
                     {app.event_date && (
-                      <span>{new Date(app.event_date).toLocaleDateString('ru-RU')}</span>
+                      <span>
+                        {new Date(app.event_date).toLocaleDateString('ru-RU')}
+                        {app.event_time ? `, ${app.event_time}` : ''}
+                      </span>
                     )}
                     {app.location && <span>{app.location}</span>}
                     <span>{'Подана: ' + new Date(app.created_at).toLocaleDateString('ru-RU')}</span>
                   </div>
-                  {app.comment && (
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      {'Комментарий: ' + app.comment}
+                  {app.reject_reason && app.status === 'rejected' && (
+                    <p className="mt-1 text-xs text-destructive">
+                      {'Причина отклонения: ' + app.reject_reason}
                     </p>
                   )}
                 </div>

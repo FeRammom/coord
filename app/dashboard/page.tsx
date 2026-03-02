@@ -37,7 +37,7 @@ export default async function DashboardPage() {
     SELECT e.* FROM events e 
     WHERE e.status IN ('planned', 'active')
     AND e.id NOT IN (SELECT event_id FROM applications WHERE user_id = ?)
-    ORDER BY e.event_date ASC
+    ORDER BY e.date ASC
     LIMIT 5
   `).all(session!.id) as Event[]
 
@@ -68,9 +68,10 @@ export default async function DashboardPage() {
                   <div key={event.id} className="flex items-center justify-between rounded-lg border p-3">
                     <div>
                       <p className="text-sm font-medium">{event.title}</p>
-                      {event.event_date && (
+                      {event.date && (
                         <p className="text-xs text-muted-foreground">
-                          {new Date(event.event_date).toLocaleDateString('ru-RU')}
+                          {new Date(event.date).toLocaleDateString('ru-RU')}
+                          {event.time ? `, ${event.time}` : ''}
                         </p>
                       )}
                     </div>
