@@ -118,12 +118,7 @@ export function EventsTable({ events }: { events: Event[] }) {
                         </Button>
                       </Link>
                       <EventFormDialog mode="edit" event={event} />
-                      <form
-                        action={async () => {
-                          'use server'
-                          await deleteEventAction(event.id)
-                        }}
-                      >
+                      <form action={deleteEventAction.bind(null, event.id)}>
                         <Button variant="ghost" size="icon-sm" className="text-destructive hover:text-destructive" title="Удалить">
                           <Trash2 className="h-4 w-4" />
                         </Button>

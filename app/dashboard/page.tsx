@@ -49,8 +49,8 @@ export default async function DashboardPage() {
       <p className="mt-1 text-sm text-muted-foreground">Ваша панель координатора</p>
 
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
+        <Card className="py-0 gap-0">
+          <CardHeader className="flex flex-row items-center justify-between py-4">
             <CardTitle className="flex items-center gap-2 text-base">
               <CalendarDays className="h-4 w-4 text-primary" />
               Доступные мероприятия
@@ -59,7 +59,7 @@ export default async function DashboardPage() {
               <Button variant="ghost" size="sm">Все</Button>
             </Link>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pb-4">
             {availableEvents.length === 0 ? (
               <p className="text-sm text-muted-foreground">Нет доступных мероприятий</p>
             ) : (
@@ -82,8 +82,8 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
+        <Card className="py-0 gap-0">
+          <CardHeader className="flex flex-row items-center justify-between py-4">
             <CardTitle className="flex items-center gap-2 text-base">
               <ClipboardList className="h-4 w-4 text-primary" />
               Мои заявки
@@ -92,7 +92,7 @@ export default async function DashboardPage() {
               <Button variant="ghost" size="sm">Все</Button>
             </Link>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pb-4">
             {myApps.length === 0 ? (
               <p className="text-sm text-muted-foreground">У вас пока нет заявок</p>
             ) : (

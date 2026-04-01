@@ -11,9 +11,9 @@ export function LoginForm() {
   const [state, formAction, isPending] = useActionState(loginAction, null)
 
   return (
-    <Card className="border-border/60 shadow-lg">
+    <Card className="border-border/60 shadow-lg py-0">
       <form action={formAction}>
-        <CardContent className="flex flex-col gap-4 pt-6">
+        <CardContent className="flex flex-col gap-4 pt-6 pb-4">
           {state?.error && (
             <div className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
               {state.error}
@@ -40,7 +40,7 @@ export function LoginForm() {
             />
           </div>
         </CardContent>
-        <CardFooter>
+        <CardFooter className="pb-6">
           <Button type="submit" className="w-full" disabled={isPending}>
             {isPending ? 'Вход...' : 'Войти'}
           </Button>

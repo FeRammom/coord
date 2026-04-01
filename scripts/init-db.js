@@ -1,6 +1,8 @@
 import Database from 'better-sqlite3';
-import { hashSync } from 'bcryptjs';
+import bcrypt from 'bcryptjs';
 import { join } from 'path';
+
+const { hashSync } = bcrypt;
 
 const dbPath = join(process.cwd(), 'database.db');
 const db = new Database(dbPath);
@@ -11,71 +13,73 @@ db.pragma('foreign_keys = ON');
 db.exec(`
   CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    full_name TEXT NOT NULL,
-    direction TEXT DEFAULT '',
-    group_name TEXT DEFAULT '',
-    phone TEXT DEFAULT '',
-    residence TEXT DEFAULT '',
     login TEXT UNIQUE NOT NULL,
     password_hash TEXT NOT NULL,
     role TEXT NOT NULL DEFAULT 'coordinator',
+    full_name TEXT NOT NULL,
+    email TEXT DEFAULT NULL,
+    phone TEXT DEFAULT NULL,
+    organization TEXT DEFAULT NULL,
     created_at TEXT DEFAULT (datetime('now'))
   );
 
   CREATE TABLE IF NOT EXISTS events (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     title TEXT NOT NULL,
-    date TEXT NOT NULL,
-    time TEXT NOT NULL,
-    location TEXT NOT NULL,
-    participant_limit INTEGER NOT NULL DEFAULT 0,
+    description TEXT DEFAULT NULL,
+    event_date TEXT DEFAULT NULL,
+    location TEXT DEFAULT NULL,
+    max_coordinators INTEGER DEFAULT NULL,
+    status TEXT NOT NULL DEFAULT 'planned',
     created_at TEXT DEFAULT (datetime('now'))
   );
 
   CREATE TABLE IF NOT EXISTS applications (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     event_id INTEGER NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     status TEXT NOT NULL DEFAULT 'pending',
-    reject_reason TEXT DEFAULT '',
+    comment TEXT DEFAULT NULL,
     created_at TEXT DEFAULT (datetime('now')),
     UNIQUE(user_id, event_id)
   );
 
   CREATE TABLE IF NOT EXISTS ratings (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     event_id INTEGER NOT NULL REFERENCES events(id) ON DELETE CASCADE,
-    admin_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     score INTEGER NOT NULL CHECK(score >= 1 AND score <= 10),
+    comment TEXT DEFAULT NULL,
+    rated_by INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     created_at TEXT DEFAULT (datetime('now')),
     UNIQUE(user_id, event_id)
   );
 
   CREATE TABLE IF NOT EXISTS feedback_templates (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    event_id INTEGER REFERENCES events(id) ON DELETE SET NULL,
-    name TEXT NOT NULL,
+    event_id INTEGER NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+    title TEXT NOT NULL,
+    is_active INTEGER NOT NULL DEFAULT 1,
     created_at TEXT DEFAULT (datetime('now'))
   );
 
   CREATE TABLE IF NOT EXISTS feedback_fields (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     template_id INTEGER NOT NULL REFERENCES feedback_templates(id) ON DELETE CASCADE,
+    field_type TEXT NOT NULL DEFAULT 'text',
     label TEXT NOT NULL,
-    field_type TEXT NOT NULL DEFAULT 'string',
-    required INTEGER NOT NULL DEFAULT 0,
+    options TEXT DEFAULT NULL,
+    is_required INTEGER NOT NULL DEFAULT 0,
     sort_order INTEGER NOT NULL DEFAULT 0
   );
 
   CREATE TABLE IF NOT EXISTS feedback_responses (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    template_id INTEGER NOT NULL REFERENCES feedback_templates(id) ON DELETE CASCADE,
     user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    field_id INTEGER NOT NULL REFERENCES feedback_fields(id) ON DELETE CASCADE,
-    event_id INTEGER NOT NULL REFERENCES events(id) ON DELETE CASCADE,
-    value TEXT DEFAULT '',
+    answers TEXT NOT NULL,
     created_at TEXT DEFAULT (datetime('now')),
-    UNIQUE(user_id, field_id, event_id)
+    UNIQUE(template_id, user_id)
   );
 `);
 

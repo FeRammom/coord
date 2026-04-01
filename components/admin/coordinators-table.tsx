@@ -97,12 +97,7 @@ export function CoordinatorsTable({ coordinators }: { coordinators: User[] }) {
                   <TableCell>
                     <div className="flex items-center justify-end gap-1">
                       <CoordinatorFormDialog mode="edit" coordinator={coord} />
-                      <form
-                        action={async () => {
-                          'use server'
-                          await deleteCoordinatorAction(coord.id)
-                        }}
-                      >
+                      <form action={deleteCoordinatorAction.bind(null, coord.id)}>
                         <Button
                           variant="ghost"
                           size="icon-sm"

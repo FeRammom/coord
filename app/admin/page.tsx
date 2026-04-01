@@ -29,14 +29,14 @@ export default async function AdminPage() {
       <div className="flex-1 p-6">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {stats.map((stat) => (
-            <Card key={stat.title}>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <Card key={stat.title} className="py-0 gap-0">
+              <CardHeader className="flex flex-row items-center justify-between py-4 pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
                   {stat.title}
                 </CardTitle>
                 <stat.icon className={`h-5 w-5 ${stat.color}`} />
               </CardHeader>
-              <CardContent>
+              <CardContent className="pb-4">
                 <div className="text-2xl font-bold">{stat.value}</div>
               </CardContent>
             </Card>
