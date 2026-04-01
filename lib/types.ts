@@ -3,6 +3,7 @@ export interface User {
   login: string
   password_hash: string
   role: 'admin' | 'coordinator'
+  is_super: number // 1 = главный админ, 0 = младший админ
   full_name: string
   email: string | null
   phone: string | null

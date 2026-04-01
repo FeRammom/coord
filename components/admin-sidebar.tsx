@@ -10,6 +10,7 @@ import {
   BarChart3,
   LogOut,
   KeyRound,
+  ShieldCheck,
 } from 'lucide-react'
 import {
   Sidebar,
@@ -27,7 +28,7 @@ import {
 import { logoutAction } from '@/app/actions/auth'
 import type { SessionPayload } from '@/lib/auth'
 
-const navItems = [
+const baseNavItems = [
   { title: 'Главная', href: '/admin', icon: LayoutDashboard },
   { title: 'Мероприятия', href: '/admin/events', icon: CalendarDays },
   { title: 'Координаторы', href: '/admin/coordinators', icon: Users },
@@ -35,8 +36,16 @@ const navItems = [
   { title: 'Статистика', href: '/admin/stats', icon: BarChart3 },
 ]
 
+const superAdminItems = [
+  { title: 'Администраторы', href: '/admin/admins', icon: ShieldCheck },
+]
+
 export function AdminSidebar({ session }: { session: SessionPayload }) {
   const pathname = usePathname()
+  
+  const navItems = session.isSuper 
+    ? [...baseNavItems, ...superAdminItems]
+    : baseNavItems
 
   return (
     <Sidebar>
@@ -102,7 +111,9 @@ export function AdminSidebar({ session }: { session: SessionPayload }) {
           </div>
           <div className="flex flex-1 flex-col overflow-hidden">
             <span className="truncate text-sm font-medium">{session.fullName}</span>
-            <span className="truncate text-xs text-muted-foreground">Администратор</span>
+            <span className="truncate text-xs text-muted-foreground">
+              {session.isSuper ? 'Главный администратор' : 'Администратор'}
+            </span>
           </div>
           <form action={logoutAction}>
             <button

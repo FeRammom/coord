@@ -34,6 +34,7 @@ export async function loginAction(
     id: user.id,
     login: user.login,
     role: user.role,
+    isSuper: user.is_super === 1,
     fullName: user.full_name,
   })
 

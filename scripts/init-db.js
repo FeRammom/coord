@@ -16,6 +16,7 @@ db.exec(`
     login TEXT UNIQUE NOT NULL,
     password_hash TEXT NOT NULL,
     role TEXT NOT NULL DEFAULT 'coordinator',
+    is_super INTEGER NOT NULL DEFAULT 0,
     full_name TEXT NOT NULL,
     email TEXT DEFAULT NULL,
     phone TEXT DEFAULT NULL,
@@ -88,12 +89,14 @@ const existing = db.prepare('SELECT id FROM users WHERE login = ?').get('admin')
 if (!existing) {
   const hash = hashSync('admin', 10);
   db.prepare(`
-    INSERT INTO users (full_name, login, password_hash, role)
-    VALUES (?, ?, ?, ?)
-  `).run('Администратор', 'admin', hash, 'admin');
-  console.log('Admin user created: login=admin, password=admin');
+    INSERT INTO users (full_name, login, password_hash, role, is_super)
+    VALUES (?, ?, ?, ?, ?)
+  `).run('Администратор', 'admin', hash, 'admin', 1);
+  console.log('Admin user created: login=admin, password=admin (super admin)');
 } else {
-  console.log('Admin user already exists, skipping seed.');
+  // Ensure existing admin is super admin
+  db.prepare('UPDATE users SET is_super = 1 WHERE login = ?').run('admin');
+  console.log('Admin user already exists, ensured is_super=1.');
 }
 
 console.log('Database initialized successfully at:', dbPath);

@@ -9,6 +9,7 @@ export interface SessionPayload {
   id: number
   login: string
   role: 'admin' | 'coordinator'
+  isSuper: boolean // true = главный админ
   fullName: string
 }
 
@@ -40,6 +41,14 @@ export async function getSession(): Promise<SessionPayload | null> {
 export async function requireAdmin(): Promise<SessionPayload> {
   const session = await getSession()
   if (!session || session.role !== 'admin') {
+    throw new Error('Unauthorized')
+  }
+  return session
+}
+
+export async function requireSuperAdmin(): Promise<SessionPayload> {
+  const session = await getSession()
+  if (!session || session.role !== 'admin' || !session.isSuper) {
     throw new Error('Unauthorized')
   }
   return session
